@@ -2,13 +2,11 @@ name: Build APK
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: ["master"]
     paths-ignore:
       - "**.md"
       - "docs/**"
-  pull_request:
-    branches: ["main", "master"]
-  workflow_dispatch: # 支持手动触发
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,17 +21,14 @@ jobs:
           distribution: "zulu"
           java-version: 17
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Generate Gradle Wrapper
-        run: gradle wrapper --gradle-version 8.9
-
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
