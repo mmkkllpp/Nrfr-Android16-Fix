@@ -93,7 +93,15 @@ class PrivilegedCarrierConfigInstrumentation : Instrumentation() {
 
     private fun overrideCarrierConfig(subId: Int, bundle: PersistableBundle?, persistent: Boolean) {
         val mgr = targetContext.getSystemService(Context.CARRIER_CONFIG_SERVICE) as? CarrierConfigManager ?: return
-        mgr.overrideConfig(subId, bundle, persistent)
+        try {
+            val m = CarrierConfigManager::class.java.getMethod("overrideConfig",
+                Int::class.javaPrimitiveType, PersistableBundle::class.java, Boolean::class.javaPrimitiveType)
+            m.invoke(mgr, subId, bundle, persistent)
+        } catch (_: NoSuchMethodException) {
+            val m = CarrierConfigManager::class.java.getMethod("overrideConfig",
+                Int::class.javaPrimitiveType, PersistableBundle::class.java)
+            m.invoke(mgr, subId, bundle)
+        }
     }
 
     private fun getPersistableBundle(arguments: Bundle): PersistableBundle? {
